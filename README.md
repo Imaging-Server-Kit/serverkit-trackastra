@@ -3,8 +3,6 @@
 
 Implementation of a web server for [Trackastra](https://github.com/weigertlab/trackastra).
 
-Author: EPFL Center for Imaging
-
 ## Installing the algorithm server with `pip`
 
 Install dependencies:
