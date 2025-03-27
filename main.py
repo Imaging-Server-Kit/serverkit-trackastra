@@ -24,7 +24,7 @@ class Parameters(BaseModel):
     mask: str = Field(
         title="Mask",
         description="Input segmentation mask (2D, 3D).",
-        json_schema_extra={"widget_type": "labels"},
+        json_schema_extra={"widget_type": "mask"},
     )
     mode: Literal['greedy', 'greedy_nodiv'] = Field(
         default='greedy',
