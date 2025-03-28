@@ -12,12 +12,12 @@ from imaging_server_kit.client import Client
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from main import Server
+from main import TrackastraServer
 
 
 def run_algorithm_server_side():
     # Create a Server instance
-    server = Server()
+    server = TrackastraServer()
 
     # Get the algorithm parameters
     algo_params_schema = server.parameters_model.model_json_schema()
@@ -129,5 +129,5 @@ def test_compare_algo_outputs():
         ), "Server and client algorithm outputs do not match."
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     test_compare_algo_outputs()

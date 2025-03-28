@@ -2,6 +2,7 @@
 Algorithm server definition.
 Documentation: https://github.com/Imaging-Server-Kit/cookiecutter-serverkit
 """
+
 from typing import List, Literal, Type
 from pathlib import Path
 import numpy as np
@@ -14,8 +15,10 @@ import imaging_server_kit as serverkit
 from trackastra.model import Trackastra
 from trackastra.tracking import graph_to_napari_tracks
 
+
 class Parameters(BaseModel):
     """Defines the algorithm parameters"""
+
     image: str = Field(
         title="Image",
         description="Input image (2D, 3D).",
@@ -26,8 +29,8 @@ class Parameters(BaseModel):
         description="Input segmentation mask (2D, 3D).",
         json_schema_extra={"widget_type": "mask"},
     )
-    mode: Literal['greedy', 'greedy_nodiv'] = Field(
-        default='greedy',
+    mode: Literal["greedy", "greedy_nodiv"] = Field(
+        default="greedy",
         title="Mode",
         description="Tracking mode.",
         json_schema_extra={"widget_type": "dropdown"},
@@ -47,20 +50,17 @@ class Parameters(BaseModel):
             raise ValueError("Array has the wrong dimensionality.")
         return mask_array
 
-class Server(serverkit.Server):
+
+class TrackastraServer(serverkit.AlgorithmServer):
     def __init__(
         self,
-        algorithm_name: str="trackastra",
-        parameters_model: Type[BaseModel]=Parameters
+        algorithm_name: str = "trackastra",
+        parameters_model: Type[BaseModel] = Parameters,
     ):
         super().__init__(algorithm_name, parameters_model)
 
     def run_algorithm(
-        self,
-        image: np.ndarray,
-        mask: np.ndarray,
-        mode: str,
-        **kwargs
+        self, image: np.ndarray, mask: np.ndarray, mode: str, **kwargs
     ) -> List[tuple]:
         """Runs the algorithm."""
 
@@ -68,10 +68,12 @@ class Server(serverkit.Server):
 
         model = Trackastra.from_pretrained("general_2d", device=device)
 
-        track_graph = model.track(image, mask, mode=mode)  # or mode="ilp", or "greedy_nodiv"
+        track_graph = model.track(
+            image, mask, mode=mode
+        )  # or mode="ilp", or "greedy_nodiv"
 
         napari_tracks, napari_tracks_graph, _ = graph_to_napari_tracks(track_graph)
-        
+
         return [(napari_tracks, {"name": "Tracks"}, "tracks")]
 
     def load_sample_images(self) -> List["np.ndarray"]:
@@ -80,8 +82,9 @@ class Server(serverkit.Server):
         images = [skimage.io.imread(image_path) for image_path in image_dir.glob("*")]
         return images
 
-server = Server()
+
+server = TrackastraServer()
 app = server.app
 
-if __name__=='__main__':
+if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
